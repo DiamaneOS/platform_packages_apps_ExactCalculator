@@ -17,10 +17,11 @@
 
 <resources>
 
-    <style name="Theme" parent="@android:style/Theme.Material.Light.DarkActionBar">
-        <item name="android:colorPrimary">@color/calculator_primary_color</item>
-        <item name="android:colorAccent">@color/calculator_accent_color</item>
-        <item name="android:statusBarColor">@color/calculator_accent_color</item>
+    <!-- Follows the system's light or dark theme and its dynamic colours. -->
+    <style name="Theme" parent="@android:style/Theme.DeviceDefault.DayNight">
+        <item name="android:windowBackground">@color/display_background_color</item>
+        <item name="android:windowLightStatusBar">?android:attr/isLightTheme</item>
+        <item name="android:windowLightNavigationBar">?android:attr/isLightTheme</item>
         <item name="android:windowSoftInputMode">stateAlwaysHidden</item>
     </style>
 
