@@ -29,6 +29,7 @@
         android:id="@+id/history_frame"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/display_background_color"
         android:visibility="invisible" />
 
 </com.android.calculator2.DragLayout>

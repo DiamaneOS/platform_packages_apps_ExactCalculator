@@ -41,6 +41,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.graphics.Insets;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
@@ -67,6 +68,7 @@ import android.view.View.OnLongClickListener;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroupOverlay;
 import android.view.ViewTreeObserver;
+import android.view.WindowInsets;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.HorizontalScrollView;
 import android.widget.TextView;
@@ -427,6 +429,7 @@ public class Calculator extends Activity
         mDragLayout.removeDragCallback(this);
         mDragLayout.addDragCallback(this);
         mDragLayout.setCloseCallback(this);
+        applyWindowInsets();
 
         mFormulaText.setOnContextMenuClickListener(mOnFormulaContextMenuClickListener);
         mFormulaText.setOnDisplayMemoryOperationsListener(mOnDisplayMemoryOperationsListener);
@@ -1535,6 +1538,24 @@ public class Calculator extends Activity
     @Override
     public void onContextMenuClosed(Menu menu) {
         stopActionModeOrContextMenu();
+    }
+
+    /**
+     * Draws edge to edge: the display reaches under the status bar, and the keys and the history
+     * stay clear of the system bars and the display cutout.
+     */
+    private void applyWindowInsets() {
+        final View historyFrame = findViewById(R.id.history_frame);
+        final int displayPaddingTop = mDisplayView.getPaddingTop();
+        mDragLayout.setOnApplyWindowInsetsListener((v, windowInsets) -> {
+            final Insets insets = windowInsets.getInsets(
+                    WindowInsets.Type.systemBars() | WindowInsets.Type.displayCutout());
+            mDisplayView.setPadding(mDisplayView.getPaddingLeft(), displayPaddingTop + insets.top,
+                    mDisplayView.getPaddingRight(), mDisplayView.getPaddingBottom());
+            mMainCalculator.setPadding(insets.left, 0, insets.right, insets.bottom);
+            historyFrame.setPadding(insets.left, insets.top, insets.right, insets.bottom);
+            return WindowInsets.CONSUMED;
+        });
     }
 
     public interface OnDisplayMemoryOperationsListener {
