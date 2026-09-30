@@ -57,6 +57,7 @@ import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.util.Property;
+import android.util.TypedValue;
 import android.view.ActionMode;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
@@ -66,6 +67,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnLongClickListener;
 import android.view.ViewAnimationUtils;
+import android.view.ViewGroup;
 import android.view.ViewGroupOverlay;
 import android.view.ViewTreeObserver;
 import android.view.WindowInsets;
@@ -430,6 +432,7 @@ public class Calculator extends Activity
         mDragLayout.addDragCallback(this);
         mDragLayout.setCloseCallback(this);
         applyWindowInsets();
+        scaleKeyLabelsWithTextSize();
 
         mFormulaText.setOnContextMenuClickListener(mOnFormulaContextMenuClickListener);
         mFormulaText.setOnDisplayMemoryOperationsListener(mOnDisplayMemoryOperationsListener);
@@ -1556,6 +1559,30 @@ public class Calculator extends Activity
             historyFrame.setPadding(insets.left, insets.top, insets.right, insets.bottom);
             return WindowInsets.CONSUMED;
         });
+    }
+
+    /**
+     * Lets the key labels, sized in dp like the display, grow with a larger text size as far as
+     * each key has room. They never get smaller than the pad's own sizes.
+     */
+    private void scaleKeyLabelsWithTextSize() {
+        final float density = getResources().getDisplayMetrics().density;
+        for (int padId : new int[] { R.id.pad_numeric, R.id.pad_operator, R.id.pad_advanced }) {
+            final ViewGroup pad = findViewById(padId);
+            for (int i = 0; pad != null && i < pad.getChildCount(); ++i) {
+                if (!(pad.getChildAt(i) instanceof TextView)) {
+                    continue;  // The delete key's icon.
+                }
+                final TextView key = (TextView) pad.getChildAt(i);
+                final int size = Math.round(key.getTextSize());
+                final int scaled = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,
+                        size / density, getResources().getDisplayMetrics()));
+                if (scaled > size) {
+                    key.setAutoSizeTextTypeUniformWithConfiguration(size, scaled, 1,
+                            TypedValue.COMPLEX_UNIT_PX);
+                }
+            }
+        }
     }
 
     public interface OnDisplayMemoryOperationsListener {
