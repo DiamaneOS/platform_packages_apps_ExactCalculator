@@ -1592,7 +1592,8 @@ public class Calculator extends Activity
 
     /**
      * Draws edge to edge: the display reaches under the status bar, and the keys and the history
-     * stay clear of the system bars and the display cutout.
+     * stay clear of the system bars and the display cutout. The collapsed advanced pad's handle
+     * stays clear of the Back gesture strip too, so a swipe from it opens the pad.
      */
     private void applyWindowInsets() {
         final View historyFrame = findViewById(R.id.history_frame);
@@ -1604,6 +1605,11 @@ public class Calculator extends Activity
                     mDisplayView.getPaddingRight(), mDisplayView.getPaddingBottom());
             mMainCalculator.setPadding(insets.left, 0, insets.right, insets.bottom);
             historyFrame.setPadding(insets.left, insets.top, insets.right, insets.bottom);
+            if (mPadViewPager instanceof CalculatorPadViewPager) {
+                final Insets gestures = windowInsets.getInsets(WindowInsets.Type.systemGestures());
+                ((CalculatorPadViewPager) mPadViewPager).setBackGestureInset(
+                        gestures.right - insets.right);
+            }
             return WindowInsets.CONSUMED;
         });
     }

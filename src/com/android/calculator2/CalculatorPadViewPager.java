@@ -130,6 +130,7 @@ public class CalculatorPadViewPager extends ViewPager {
                 view.setTranslationX(0.0f);
                 view.setAlpha(1.0f);
             }
+            updateAdvancedPadShift();
         }
     };
 
@@ -156,6 +157,12 @@ public class CalculatorPadViewPager extends ViewPager {
 
     private int mClickedItemIndex = -1;
 
+    /** How far the collapsed advanced pad overlaps the first page: its handle. */
+    private final int mHandleWidth;
+
+    /** The width of the Back gesture strip at the right edge that the handle keeps clear of. */
+    private int mBackGestureInset;
+
     public CalculatorPadViewPager(Context context) {
         this(context, null /* attrs */);
     }
@@ -167,7 +174,8 @@ public class CalculatorPadViewPager extends ViewPager {
         mGestureDetector.setIsLongpressEnabled(false);
 
         setAdapter(mStaticPagerAdapter);
-        setPageMargin(-getResources().getDimensionPixelSize(R.dimen.pad_page_margin));
+        mHandleWidth = getResources().getDimensionPixelSize(R.dimen.pad_page_margin);
+        setPageMargin(-mHandleWidth);
         setPageTransformer(false, mPageTransformer);
         addOnPageChangeListener(mOnPageChangeListener);
     }
@@ -181,6 +189,53 @@ public class CalculatorPadViewPager extends ViewPager {
 
         // Let page change listener know about our initial position.
         mOnPageChangeListener.onPageSelected(getCurrentItem());
+    }
+
+    @Override
+    protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        super.onLayout(changed, l, t, r, b);
+        updateAdvancedPadShift();
+    }
+
+    /**
+     * Keeps the collapsed advanced pad's handle clear of a Back gesture strip of the given width
+     * at the right edge, so a swipe from the handle opens the pad instead of going back. The
+     * handle widens by the strip and the first page's keys make room for it.
+     */
+    public void setBackGestureInset(int inset) {
+        inset = Math.max(0, inset);
+        if (inset == mBackGestureInset || getChildCount() < 2) {
+            return;
+        }
+        final View firstPage = getChildAt(0);
+        firstPage.setPadding(firstPage.getPaddingLeft(), firstPage.getPaddingTop(),
+                firstPage.getPaddingRight() - mBackGestureInset + inset,
+                firstPage.getPaddingBottom());
+        mBackGestureInset = inset;
+        setPageMargin(-(mHandleWidth + inset));
+    }
+
+    /**
+     * Moves the advanced pad's keys right by the Back gesture inset while the pad is collapsed,
+     * and back as it opens, so its wider handle shows no more of them than without the inset.
+     */
+    private void updateAdvancedPadShift() {
+        if (getChildCount() < 2) {
+            return;
+        }
+        final View advancedPad = getChildAt(1);
+        int shift = 0;
+        if (mBackGestureInset > 0) {
+            // Where the pad starts when open and when collapsed, and where it is now.
+            final int openLeft = getWidth() - getPaddingRight() - advancedPad.getWidth();
+            final int closedLeft = advancedPad.getLeft();
+            final int left = advancedPad.getLeft() - getScrollX();
+            if (closedLeft > openLeft) {
+                final float collapsed = (float) (left - openLeft) / (closedLeft - openLeft);
+                shift = Math.round(mBackGestureInset * Math.max(0.0f, Math.min(1.0f, collapsed)));
+            }
+        }
+        advancedPad.setScrollX(-shift);
     }
 
     @Override
