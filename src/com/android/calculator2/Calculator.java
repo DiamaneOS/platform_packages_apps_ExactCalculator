@@ -75,6 +75,8 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.HorizontalScrollView;
 import android.widget.TextView;
 import android.widget.Toolbar;
+import android.window.OnBackInvokedCallback;
+import android.window.OnBackInvokedDispatcher;
 
 import com.android.calculator2.CalculatorFormula.OnTextSizeChangeListener;
 
@@ -262,6 +264,11 @@ public class Calculator extends Activity
     private DragLayout mDragLayout;
 
     private ViewPager mPadViewPager;
+    // Back closes the history, the advanced pad or a copy and paste bar while one is open (see
+    // updateBackCallback). Otherwise the system's predictive Back leaves the app.
+    private final OnBackInvokedCallback mBackCallback = this::onBackPressed;
+    private boolean mBackCallbackRegistered;
+    private int mActionModes;
     private View mDeleteButton;
     private View mClearButton;
     private View mEqualButton;
@@ -437,6 +444,15 @@ public class Calculator extends Activity
         applyWindowInsets();
         enlargeOperatorSymbols();
         scaleKeyLabelsWithTextSize();
+        if (mPadViewPager != null) {
+            mPadViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+                @Override
+                public void onPageSelected(int position) {
+                    updateBackCallback();
+                }
+            });
+        }
+        getFragmentManager().addOnBackStackChangedListener(this::updateBackCallback);
 
         mFormulaText.setOnContextMenuClickListener(mOnFormulaContextMenuClickListener);
         mFormulaText.setOnDisplayMemoryOperationsListener(mOnDisplayMemoryOperationsListener);
@@ -459,6 +475,7 @@ public class Calculator extends Activity
     @Override
     protected void onResume() {
         super.onResume();
+        updateBackCallback();
         if (mDisplayView.isToolbarVisible()) {
             showAndMaybeHideToolbar();
         }
@@ -573,6 +590,36 @@ public class Calculator extends Activity
         if (mode.getTag() == CalculatorFormula.TAG_ACTION_MODE) {
             mFormulaContainer.scrollTo(mFormulaText.getRight(), 0);
         }
+        ++mActionModes;
+        updateBackCallback();
+    }
+
+    @Override
+    public void onActionModeFinished(ActionMode mode) {
+        super.onActionModeFinished(mode);
+        mActionModes = Math.max(0, mActionModes - 1);
+        updateBackCallback();
+    }
+
+    /**
+     * With predictive Back the system no longer calls onBackPressed(). Registers it as the Back
+     * callback only while there is something for it to close (the history, the advanced pad, or a
+     * copy and paste bar), so that otherwise Back leaves the app with the system's animation.
+     */
+    private void updateBackCallback() {
+        final boolean somethingToClose = mActionModes > 0 || getHistoryFragment() != null
+                || (mPadViewPager != null && mPadViewPager.getCurrentItem() != 0);
+        if (somethingToClose == mBackCallbackRegistered) {
+            return;
+        }
+        final OnBackInvokedDispatcher dispatcher = getOnBackInvokedDispatcher();
+        if (somethingToClose) {
+            dispatcher.registerOnBackInvokedCallback(
+                    OnBackInvokedDispatcher.PRIORITY_DEFAULT, mBackCallback);
+        } else {
+            dispatcher.unregisterOnBackInvokedCallback(mBackCallback);
+        }
+        mBackCallbackRegistered = somethingToClose;
     }
 
     /**
@@ -1549,7 +1596,8 @@ public class Calculator extends Activity
 
     /**
      * Draws edge to edge: the display reaches under the status bar, and the keys and the history
-     * stay clear of the system bars and the display cutout.
+     * stay clear of the system bars and the display cutout. The collapsed advanced pad's handle
+     * stays clear of the Back gesture strip too, so a swipe from it opens the pad.
      */
     private void applyWindowInsets() {
         final View historyFrame = findViewById(R.id.history_frame);
@@ -1561,6 +1609,11 @@ public class Calculator extends Activity
                     mDisplayView.getPaddingRight(), mDisplayView.getPaddingBottom());
             mMainCalculator.setPadding(insets.left, 0, insets.right, insets.bottom);
             historyFrame.setPadding(insets.left, insets.top, insets.right, insets.bottom);
+            if (mPadViewPager instanceof CalculatorPadViewPager) {
+                final Insets gestures = windowInsets.getInsets(WindowInsets.Type.systemGestures());
+                ((CalculatorPadViewPager) mPadViewPager).setBackGestureInset(
+                        gestures.right - insets.right);
+            }
             return WindowInsets.CONSUMED;
         });
     }
