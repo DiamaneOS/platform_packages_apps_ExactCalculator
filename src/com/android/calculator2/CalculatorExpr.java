@@ -461,6 +461,37 @@ class CalculatorExpr {
     }
 
     /**
+     * The parenthesis a single ( ) key adds: a right one when a parenthesis is open and the
+     * expression ends with something a right parenthesis can follow (a number, π, e, a
+     * preevaluated expression, a right parenthesis or a suffix operator such as ! or %), else a
+     * left one. Functions such as sin( count as open parentheses.
+     * @return R.id.rparen or R.id.lparen
+     */
+    int nextParenthesis() {
+        int open = 0;
+        for (Token t : mExpr) {
+            if (t instanceof Operator) {
+                final int id = ((Operator) t).id;
+                if (id == R.id.lparen || KeyMaps.isFunc(id)) {
+                    ++open;
+                } else if (id == R.id.rparen) {
+                    --open;
+                }
+            }
+        }
+        if (open <= 0 || mExpr.isEmpty()) {
+            return R.id.lparen;
+        }
+        final Token last = mExpr.get(mExpr.size() - 1);
+        if (!(last instanceof Operator)) {
+            return R.id.rparen;  // A number or a preevaluated expression.
+        }
+        final int id = ((Operator) last).id;
+        return id == R.id.rparen || id == R.id.const_pi || id == R.id.const_e
+                || KeyMaps.isSuffix(id) ? R.id.rparen : R.id.lparen;
+    }
+
+    /**
      * Append press of button with given id to expression.
      * If the insertion would clearly result in a syntax error, either just return false
      * and do nothing, or make an adjustment to avoid the problem.  We do the latter only
