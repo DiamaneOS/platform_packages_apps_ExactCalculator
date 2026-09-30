@@ -51,17 +51,12 @@
     <!-- Background color for the advanced pad. -->
     <color name="pad_advanced_background_color">@android:color/system_surface_container_high_dark</color>
 
-    <!-- Text color for a button in a pad. -->
-    <color name="pad_button_text_color">@android:color/system_on_surface_dark</color>
-
-    <!-- Text color for a button in the advanced pad. -->
-    <color name="pad_button_advanced_text_color">@android:color/system_on_surface_variant_dark</color>
-
-    <!-- Ripple color when a button is pressed in a pad. -->
-    <color name="pad_button_ripple_color">#1FFFFFFF</color>
-
-    <!-- Ripple color when a button is pressed in a pad. -->
-    <color name="pad_button_advanced_ripple_color">#1FFFFFFF</color>
+    <!-- Key faces and labels whose roles are not Tally tokens. -->
+    <color name="key_operator_color">@android:color/system_secondary_container_dark</color>
+    <color name="key_operator_text_color">@android:color/system_on_secondary_container_dark</color>
+    <color name="key_clear_color">@android:color/system_primary_container_dark</color>
+    <color name="key_clear_text_color">@android:color/system_on_primary_container_dark</color>
+    <color name="key_advanced_face_color">@android:color/system_surface_container_highest_dark</color>
 
     <!-- Background color for empty history view. -->
     <color name="empty_history_color">@android:color/system_surface_container_dark</color>

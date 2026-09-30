@@ -16,6 +16,8 @@ android_app {
 
     static_libs: [
         "cr",
+        // Tally keycap tokens (frameworks/libs/systemui): key radius, relief, press, focus ring.
+        "tallytokens",
         "androidx.gridlayout_gridlayout",
         "androidx.recyclerview_recyclerview",
         "androidx.viewpager_viewpager",

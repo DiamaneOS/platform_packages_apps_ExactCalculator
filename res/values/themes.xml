@@ -34,6 +34,35 @@
         <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>
     </style>
 
+    <!--
+      Key colours, set with android:theme on each pad and on the keys that differ: Material 3
+      roles in the Tally keycap shape (KeycapDrawable).
+      -->
+    <style name="ThemeOverlay.Calculator.Key.Numeric" parent="">
+        <item name="keyColor">@color/key_numeric_color</item>
+        <item name="keyTextColor">@color/key_numeric_text_color</item>
+    </style>
+
+    <style name="ThemeOverlay.Calculator.Key.Operator" parent="">
+        <item name="keyColor">@color/key_operator_color</item>
+        <item name="keyTextColor">@color/key_operator_text_color</item>
+    </style>
+
+    <style name="ThemeOverlay.Calculator.Key.Clear" parent="">
+        <item name="keyColor">@color/key_clear_color</item>
+        <item name="keyTextColor">@color/key_clear_text_color</item>
+    </style>
+
+    <style name="ThemeOverlay.Calculator.Key.Equals" parent="">
+        <item name="keyColor">@color/key_equals_color</item>
+        <item name="keyTextColor">@color/key_equals_text_color</item>
+    </style>
+
+    <style name="ThemeOverlay.Calculator.Key.Advanced" parent="">
+        <item name="keyColor">@color/key_advanced_color</item>
+        <item name="keyTextColor">@color/key_advanced_text_color</item>
+    </style>
+
     <style name="Theme.Licenses">
         <item name="android:title">@string/menu_licenses</item>
         <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>

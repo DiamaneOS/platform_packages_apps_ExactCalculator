@@ -15,5 +15,6 @@
   limitations under the License.
   -->
 
-<ripple xmlns:android="http://schemas.android.com/apk/res/android"
-    android:color="@color/pad_button_ripple_color" />
+<!-- A Tally keycap in the theme's keyColor (see ThemeOverlay.Calculator.Key). -->
+<drawable xmlns:android="http://schemas.android.com/apk/res/android"
+    class="com.android.calculator2.KeycapDrawable" />

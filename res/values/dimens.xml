@@ -17,6 +17,9 @@
 
 <resources>
 
+    <!-- Room around the delete key's icon: the keycap face's 4 dp inset and 2 dp more. -->
+    <dimen name="pad_icon_padding">6dip</dimen>
+
     <!-- The margin between the pad pages when displayed using a view pager. -->
     <dimen name="pad_page_margin">24dip</dimen>
 

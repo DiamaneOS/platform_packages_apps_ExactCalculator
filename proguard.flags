@@ -51,6 +51,11 @@
 # platform version.  We know about them, and they are safe.
 -dontwarn android.support.**
 
+# The pad keys' background, inflated from XML by class name.
+-keep public class com.android.calculator2.KeycapDrawable {
+    public <init>();
+}
+
 # Some small BoundedRational methods like equals() are not used by the
 # calculator, but crucial for testing.
 -keepclassmembers class com.android.calculator2.BoundedRational { *; }

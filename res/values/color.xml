@@ -52,17 +52,20 @@
     <!-- Background color for the advanced pad. -->
     <color name="pad_advanced_background_color">@android:color/system_surface_container_high_light</color>
 
-    <!-- Text color for a button in a pad. -->
-    <color name="pad_button_text_color">@android:color/system_on_surface_light</color>
-
-    <!-- Text color for a button in the advanced pad. -->
-    <color name="pad_button_advanced_text_color">@android:color/system_on_surface_variant_light</color>
-
-    <!-- Ripple color when a button is pressed in a pad. -->
-    <color name="pad_button_ripple_color">#1F000000</color>
-
-    <!-- Ripple color when a button is pressed in a pad. -->
-    <color name="pad_button_advanced_ripple_color">#1F000000</color>
+    <!--
+      Key faces and labels (ThemeOverlay.Calculator.Key). Numbers, equals and the advanced pad's
+      selected toggle use the Tally roles, which follow the theme by themselves.
+      -->
+    <color name="key_numeric_color">@color/tally_surface_high</color>
+    <color name="key_numeric_text_color">@color/tally_ink</color>
+    <color name="key_operator_color">@android:color/system_secondary_container_light</color>
+    <color name="key_operator_text_color">@android:color/system_on_secondary_container_light</color>
+    <color name="key_clear_color">@android:color/system_primary_container_light</color>
+    <color name="key_clear_text_color">@android:color/system_on_primary_container_light</color>
+    <color name="key_equals_color">@color/tally_accent</color>
+    <color name="key_equals_text_color">@color/tally_on_accent</color>
+    <color name="key_advanced_face_color">@android:color/system_surface_container_highest_light</color>
+    <color name="key_advanced_text_color">@color/tally_ink</color>
 
     <!-- Background color for empty history view. -->
     <color name="empty_history_color">@android:color/system_surface_container_light</color>
