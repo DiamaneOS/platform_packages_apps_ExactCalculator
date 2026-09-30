@@ -75,6 +75,8 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.HorizontalScrollView;
 import android.widget.TextView;
 import android.widget.Toolbar;
+import android.window.OnBackInvokedCallback;
+import android.window.OnBackInvokedDispatcher;
 
 import com.android.calculator2.CalculatorFormula.OnTextSizeChangeListener;
 
@@ -259,6 +261,11 @@ public class Calculator extends Activity
     private DragLayout mDragLayout;
 
     private ViewPager mPadViewPager;
+    // Back closes the history, the advanced pad or a copy and paste bar while one is open (see
+    // updateBackCallback). Otherwise the system's predictive Back leaves the app.
+    private final OnBackInvokedCallback mBackCallback = this::onBackPressed;
+    private boolean mBackCallbackRegistered;
+    private int mActionModes;
     private View mDeleteButton;
     private View mClearButton;
     private View mEqualButton;
@@ -433,6 +440,15 @@ public class Calculator extends Activity
         mDragLayout.setCloseCallback(this);
         applyWindowInsets();
         scaleKeyLabelsWithTextSize();
+        if (mPadViewPager != null) {
+            mPadViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+                @Override
+                public void onPageSelected(int position) {
+                    updateBackCallback();
+                }
+            });
+        }
+        getFragmentManager().addOnBackStackChangedListener(this::updateBackCallback);
 
         mFormulaText.setOnContextMenuClickListener(mOnFormulaContextMenuClickListener);
         mFormulaText.setOnDisplayMemoryOperationsListener(mOnDisplayMemoryOperationsListener);
@@ -455,6 +471,7 @@ public class Calculator extends Activity
     @Override
     protected void onResume() {
         super.onResume();
+        updateBackCallback();
         if (mDisplayView.isToolbarVisible()) {
             showAndMaybeHideToolbar();
         }
@@ -569,6 +586,36 @@ public class Calculator extends Activity
         if (mode.getTag() == CalculatorFormula.TAG_ACTION_MODE) {
             mFormulaContainer.scrollTo(mFormulaText.getRight(), 0);
         }
+        ++mActionModes;
+        updateBackCallback();
+    }
+
+    @Override
+    public void onActionModeFinished(ActionMode mode) {
+        super.onActionModeFinished(mode);
+        mActionModes = Math.max(0, mActionModes - 1);
+        updateBackCallback();
+    }
+
+    /**
+     * With predictive Back the system no longer calls onBackPressed(). Registers it as the Back
+     * callback only while there is something for it to close (the history, the advanced pad, or a
+     * copy and paste bar), so that otherwise Back leaves the app with the system's animation.
+     */
+    private void updateBackCallback() {
+        final boolean somethingToClose = mActionModes > 0 || getHistoryFragment() != null
+                || (mPadViewPager != null && mPadViewPager.getCurrentItem() != 0);
+        if (somethingToClose == mBackCallbackRegistered) {
+            return;
+        }
+        final OnBackInvokedDispatcher dispatcher = getOnBackInvokedDispatcher();
+        if (somethingToClose) {
+            dispatcher.registerOnBackInvokedCallback(
+                    OnBackInvokedDispatcher.PRIORITY_DEFAULT, mBackCallback);
+        } else {
+            dispatcher.unregisterOnBackInvokedCallback(mBackCallback);
+        }
+        mBackCallbackRegistered = somethingToClose;
     }
 
     /**
