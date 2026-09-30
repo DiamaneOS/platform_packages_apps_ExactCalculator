@@ -49,9 +49,16 @@
         style="@style/PadButtonStyle.Operator.Text"
         android:theme="@style/ThemeOverlay.Calculator.Key.Clear"
         android:contentDescription="@string/desc_clr"
-        android:text="@string/clr"
-        android:visibility="gone"
-        app:layout_row="0"
+        android:text="@string/all_clear"
+        app:layout_row="1"
+        app:layout_column="1" />
+
+    <Button
+        android:id="@+id/paren"
+        style="@style/PadButtonStyle.Operator"
+        android:contentDescription="@string/desc_paren"
+        android:text="@string/paren"
+        app:layout_row="2"
         app:layout_column="1" />
 
     <Button

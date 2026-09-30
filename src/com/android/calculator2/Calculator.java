@@ -390,8 +390,17 @@ public class Calculator extends Activity
 
         mPadViewPager = (ViewPager) findViewById(R.id.pad_pager);
         mDeleteButton = findViewById(R.id.del);
-        mClearButton = findViewById(R.id.clr);
         final View numberPad = findViewById(R.id.pad_numeric);
+        // AC and ( ) sit in a two-column operator pad where it has room for them, else in the
+        // number pad's top row (with %), which is then the only place for them.
+        mClearButton = findViewById(R.id.pad_operator).findViewById(R.id.clr);
+        if (mClearButton != null) {
+            numberPad.findViewById(R.id.clr).setVisibility(View.GONE);
+            numberPad.findViewById(R.id.paren).setVisibility(View.GONE);
+            numberPad.findViewById(R.id.op_pct).setVisibility(View.GONE);
+        } else {
+            mClearButton = numberPad.findViewById(R.id.clr);
+        }
         mEqualButton = numberPad.findViewById(R.id.eq);
         if (mEqualButton == null || mEqualButton.getVisibility() != View.VISIBLE) {
             mEqualButton = findViewById(R.id.pad_operator).findViewById(R.id.eq);
@@ -500,15 +509,6 @@ public class Calculator extends Activity
                 restoreDisplayPositions();
             }
             mCurrentState = state;
-
-            if (mCurrentState == CalculatorState.RESULT) {
-                // No longer do this for ERROR; allow mistakes to be corrected.
-                mDeleteButton.setVisibility(View.GONE);
-                mClearButton.setVisibility(View.VISIBLE);
-            } else {
-                mDeleteButton.setVisibility(View.VISIBLE);
-                mClearButton.setVisibility(View.GONE);
-            }
 
             if (mIsOneLine) {
                 if (mCurrentState == CalculatorState.RESULT
@@ -836,7 +836,12 @@ public class Calculator extends Activity
         // See onKey above for the rationale behind some of the behavior below:
         cancelUnrequested();
 
-        final int id = view.getId();
+        int id = view.getId();
+        if (id == R.id.paren) {
+            // One key for both parentheses. After a result it starts a new formula.
+            id = mCurrentState == CalculatorState.RESULT ? R.id.lparen
+                    : mEvaluator.getExpr(Evaluator.MAIN_INDEX).nextParenthesis();
+        }
         switch (id) {
             case R.id.eq:
                 onEquals();
@@ -1016,7 +1021,7 @@ public class Calculator extends Activity
         // Note that we handle keyboard delete exactly like the delete button.  For
         // example the delete button can be used to delete a character from an incomplete
         // function name typed on a physical keyboard.
-        // This should be impossible in RESULT state.
+        // In RESULT state this goes back to editing the formula.
         // If there is an in-progress explicit evaluation, just cancel it and return.
         if (cancelIfEvaluating(false)) return;
         setState(CalculatorState.INPUT);
