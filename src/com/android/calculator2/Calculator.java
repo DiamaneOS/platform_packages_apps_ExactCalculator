@@ -161,6 +161,9 @@ public class Calculator extends Activity
      */
     private static final String KEY_SHOW_TOOLBAR = NAME + "_show_toolbar";
 
+    /** How much larger than the pad's operator size + − × ÷ are set (enlargeOperatorSymbols). */
+    private static final float OPERATOR_SYMBOL_SCALE = 1.25f;
+
     private final ViewTreeObserver.OnPreDrawListener mPreDrawListener =
             new ViewTreeObserver.OnPreDrawListener() {
         @Override
@@ -439,6 +442,7 @@ public class Calculator extends Activity
         mDragLayout.addDragCallback(this);
         mDragLayout.setCloseCallback(this);
         applyWindowInsets();
+        enlargeOperatorSymbols();
         scaleKeyLabelsWithTextSize();
         if (mPadViewPager != null) {
             mPadViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
@@ -1612,6 +1616,21 @@ public class Calculator extends Activity
             }
             return WindowInsets.CONSUMED;
         });
+    }
+
+    /**
+     * Sets + − × ÷ on their keys {@link #OPERATOR_SYMBOL_SCALE} times the pad's operator size, so
+     * they read as clearly as the digits beside them: Sofia Sans, the system font, draws them a
+     * fifth smaller than Roboto, for which the pad's sizes were chosen.
+     */
+    private void enlargeOperatorSymbols() {
+        for (int id : new int[] { R.id.op_div, R.id.op_mul, R.id.op_sub, R.id.op_add }) {
+            final TextView key = findViewById(id);
+            if (key != null) {
+                key.setTextSize(TypedValue.COMPLEX_UNIT_PX,
+                        key.getTextSize() * OPERATOR_SYMBOL_SCALE);
+            }
+        }
     }
 
     /**

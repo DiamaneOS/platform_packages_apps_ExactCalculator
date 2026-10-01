@@ -38,10 +38,13 @@
         app:layout_row="0"
         app:layout_column="0" />
 
+    <!-- Round parentheses from Roboto (the system's sans-serif-condensed): Sofia Sans, the
+         system font, draws them so straight that the key reads as square brackets. -->
     <Button
         android:id="@+id/paren"
         style="@style/PadButtonStyle.Operator"
         android:theme="@style/ThemeOverlay.Calculator.Key.Operator"
+        android:fontFamily="sans-serif-condensed"
         android:contentDescription="@string/desc_paren"
         android:text="@string/paren"
         app:layout_row="0"
