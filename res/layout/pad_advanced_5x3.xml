@@ -20,6 +20,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/pad_advanced"
     style="@style/PadLayoutStyle.Advanced"
+    android:theme="@style/ThemeOverlay.Calculator.Key.Advanced"
     android:background="@color/pad_advanced_background_color"
     app:rowCount="3"
     app:columnCount="5">

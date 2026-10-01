@@ -15,24 +15,7 @@
   limitations under the License.
   -->
 
-<ripple xmlns:android="http://schemas.android.com/apk/res/android"
-    android:color="@color/pad_button_advanced_ripple_color">
-    <item android:id="@android:id/mask">
-        <shape android:shape="rectangle">
-            <corners android:radius="4dip" />
-            <solid android:color="@android:color/white" />
-        </shape>
-    </item>
-    <item>
-        <selector
-            android:enterFadeDuration="@android:integer/config_longAnimTime"
-            android:exitFadeDuration="@android:integer/config_longAnimTime">
-            <item android:state_selected="true">
-                <shape android:shape="rectangle">
-                    <corners android:radius="4dip" />
-                    <solid android:color="@color/pad_button_advanced_ripple_color" />
-                </shape>
-            </item>
-        </selector>
-    </item>
-</ripple>
+<!-- A Tally keycap in the theme's keyColor (see ThemeOverlay.Calculator.Key). -->
+<!-- The key lights while selected (keyColor is a colour state list). -->
+<drawable xmlns:android="http://schemas.android.com/apk/res/android"
+    class="com.android.calculator2.KeycapDrawable" />

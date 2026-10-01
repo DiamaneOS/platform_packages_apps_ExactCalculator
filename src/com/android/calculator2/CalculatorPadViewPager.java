@@ -17,7 +17,6 @@
 package com.android.calculator2;
 
 import android.content.Context;
-import android.graphics.Color;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 import android.util.AttributeSet;
@@ -168,7 +167,6 @@ public class CalculatorPadViewPager extends ViewPager {
         mGestureDetector.setIsLongpressEnabled(false);
 
         setAdapter(mStaticPagerAdapter);
-        setBackgroundColor(Color.BLACK);
         setPageMargin(-getResources().getDimensionPixelSize(R.dimen.pad_page_margin));
         setPageTransformer(false, mPageTransformer);
         addOnPageChangeListener(mOnPageChangeListener);

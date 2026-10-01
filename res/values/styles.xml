@@ -59,7 +59,7 @@
         <item name="android:layout_width">0dip</item>
         <item name="android:layout_height">0dip</item>
         <item name="android:background">@drawable/pad_button_background</item>
-        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:fontFamily">sans-serif</item>
         <item name="android:gravity">center</item>
         <item name="android:includeFontPadding">false</item>
         <item name="android:minWidth">0dip</item>

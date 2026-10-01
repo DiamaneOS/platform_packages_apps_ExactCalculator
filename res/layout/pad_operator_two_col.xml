@@ -20,6 +20,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/pad_operator"
     style="@style/PadLayoutStyle.Operator"
+    android:theme="@style/ThemeOverlay.Calculator.Key.Operator"
     android:background="@color/pad_operator_background_color"
     app:rowCount="4"
     app:columnCount="2">
@@ -32,17 +33,21 @@
         app:layout_row="0"
         app:layout_column="0" />
 
-    <Button
+    <ImageButton
         android:id="@+id/del"
         style="@style/PadButtonStyle.Operator.Text"
         android:contentDescription="@string/desc_del"
-        android:text="@string/del"
+        android:padding="@dimen/pad_icon_padding"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_backspace"
+        android:tint="@color/pad_button_text_color"
         app:layout_row="0"
         app:layout_column="1" />
 
     <Button
         android:id="@+id/clr"
         style="@style/PadButtonStyle.Operator.Text"
+        android:theme="@style/ThemeOverlay.Calculator.Key.Clear"
         android:contentDescription="@string/desc_clr"
         android:text="@string/clr"
         android:visibility="gone"
@@ -76,6 +81,7 @@
     <Button
         android:id="@+id/eq"
         style="@style/PadButtonStyle.Operator"
+        android:theme="@style/ThemeOverlay.Calculator.Key.Equals"
         android:contentDescription="@string/desc_eq"
         android:text="@string/eq"
         app:layout_row="3"

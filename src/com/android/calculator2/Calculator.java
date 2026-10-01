@@ -41,6 +41,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.graphics.Insets;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
@@ -56,6 +57,7 @@ import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.util.Property;
+import android.util.TypedValue;
 import android.view.ActionMode;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
@@ -65,8 +67,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnLongClickListener;
 import android.view.ViewAnimationUtils;
+import android.view.ViewGroup;
 import android.view.ViewGroupOverlay;
 import android.view.ViewTreeObserver;
+import android.view.WindowInsets;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.HorizontalScrollView;
 import android.widget.TextView;
@@ -154,6 +158,9 @@ public class Calculator extends Activity
      * Associated value is an boolean holding the visibility state of the toolbar.
      */
     private static final String KEY_SHOW_TOOLBAR = NAME + "_show_toolbar";
+
+    /** How much larger than the pad's operator size + − × ÷ are set (enlargeOperatorSymbols). */
+    private static final float OPERATOR_SYMBOL_SCALE = 1.25f;
 
     private final ViewTreeObserver.OnPreDrawListener mPreDrawListener =
             new ViewTreeObserver.OnPreDrawListener() {
@@ -418,6 +425,9 @@ public class Calculator extends Activity
         mDragLayout.removeDragCallback(this);
         mDragLayout.addDragCallback(this);
         mDragLayout.setCloseCallback(this);
+        applyWindowInsets();
+        enlargeOperatorSymbols();
+        scaleKeyLabelsWithTextSize();
 
         mFormulaText.setOnContextMenuClickListener(mOnFormulaContextMenuClickListener);
         mFormulaText.setOnDisplayMemoryOperationsListener(mOnDisplayMemoryOperationsListener);
@@ -1530,6 +1540,63 @@ public class Calculator extends Activity
     @Override
     public void onContextMenuClosed(Menu menu) {
         stopActionModeOrContextMenu();
+    }
+
+    /**
+     * Draws edge to edge: the display reaches under the status bar, and the keys and the history
+     * stay clear of the system bars and the display cutout.
+     */
+    private void applyWindowInsets() {
+        final View historyFrame = findViewById(R.id.history_frame);
+        final int displayPaddingTop = mDisplayView.getPaddingTop();
+        mDragLayout.setOnApplyWindowInsetsListener((v, windowInsets) -> {
+            final Insets insets = windowInsets.getInsets(
+                    WindowInsets.Type.systemBars() | WindowInsets.Type.displayCutout());
+            mDisplayView.setPadding(mDisplayView.getPaddingLeft(), displayPaddingTop + insets.top,
+                    mDisplayView.getPaddingRight(), mDisplayView.getPaddingBottom());
+            mMainCalculator.setPadding(insets.left, 0, insets.right, insets.bottom);
+            historyFrame.setPadding(insets.left, insets.top, insets.right, insets.bottom);
+            return WindowInsets.CONSUMED;
+        });
+    }
+
+    /**
+     * Sets + − × ÷ on their keys {@link #OPERATOR_SYMBOL_SCALE} times the pad's operator size, so
+     * they read as clearly as the digits beside them: Sofia Sans, the system font, draws them a
+     * fifth smaller than Roboto, for which the pad's sizes were chosen.
+     */
+    private void enlargeOperatorSymbols() {
+        for (int id : new int[] { R.id.op_div, R.id.op_mul, R.id.op_sub, R.id.op_add }) {
+            final TextView key = findViewById(id);
+            if (key != null) {
+                key.setTextSize(TypedValue.COMPLEX_UNIT_PX,
+                        key.getTextSize() * OPERATOR_SYMBOL_SCALE);
+            }
+        }
+    }
+
+    /**
+     * Lets the key labels, sized in dp like the display, grow with a larger text size as far as
+     * each key has room. They never get smaller than the pad's own sizes.
+     */
+    private void scaleKeyLabelsWithTextSize() {
+        final float density = getResources().getDisplayMetrics().density;
+        for (int padId : new int[] { R.id.pad_numeric, R.id.pad_operator, R.id.pad_advanced }) {
+            final ViewGroup pad = findViewById(padId);
+            for (int i = 0; pad != null && i < pad.getChildCount(); ++i) {
+                if (!(pad.getChildAt(i) instanceof TextView)) {
+                    continue;  // The delete key's icon.
+                }
+                final TextView key = (TextView) pad.getChildAt(i);
+                final int size = Math.round(key.getTextSize());
+                final int scaled = Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,
+                        size / density, getResources().getDisplayMetrics()));
+                if (scaled > size) {
+                    key.setAutoSizeTextTypeUniformWithConfiguration(size, scaled, 1,
+                            TypedValue.COMPLEX_UNIT_PX);
+                }
+            }
+        }
     }
 
     public interface OnDisplayMemoryOperationsListener {

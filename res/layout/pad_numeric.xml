@@ -20,10 +20,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/pad_numeric"
     style="@style/PadLayoutStyle.Numeric"
+    android:theme="@style/ThemeOverlay.Calculator.Key.Numeric"
     android:background="@color/pad_numeric_background_color"
     app:rowCount="4"
     app:columnCount="3">
 
+    <!-- Round parentheses from Roboto (the system's sans-serif-condensed): Sofia Sans, the
+         system font, draws them so straight that the key reads as square brackets. -->
+        android:fontFamily="sans-serif-condensed"
     <Button
         android:id="@+id/digit_7"
         style="@style/PadButtonStyle.Numeric"
@@ -104,6 +108,7 @@
     <Button
         android:id="@+id/eq"
         style="@style/PadButtonStyle.Numeric.Equals"
+        android:theme="@style/ThemeOverlay.Calculator.Key.Equals"
         android:contentDescription="@string/desc_eq"
         android:text="@string/eq"
         app:layout_row="3"

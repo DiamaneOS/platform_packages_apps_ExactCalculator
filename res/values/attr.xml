@@ -23,4 +23,9 @@
         <attr name="stepTextSize" format="dimension" />
     </declare-styleable>
 
+    <!-- A pad key's face colour (a colour or colour state list), read by KeycapDrawable. -->
+    <attr name="keyColor" format="color|reference" />
+    <!-- A pad key's label colour. -->
+    <attr name="keyTextColor" format="color|reference" />
+
 </resources>
